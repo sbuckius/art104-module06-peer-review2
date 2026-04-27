@@ -270,16 +270,15 @@ textarea { min-height: 78px; overflow: hidden; }
     max-width: 100%;
   }
 
-  /* Cards */
+  /* Cards — allow breaking across pages so content is never clipped */
   .card {
     border: 1px solid #D6D3D1;
     border-radius: 6pt;
     margin-bottom: 10pt;
     box-shadow: none;
     animation: none;
-    /* CRITICAL: keep card together, break only between cards */
-    break-inside: avoid;
-    page-break-inside: avoid;
+    break-inside: auto;
+    page-break-inside: auto;
   }
 
   .card-head {
@@ -288,18 +287,46 @@ textarea { min-height: 78px; overflow: hidden; }
     print-color-adjust: exact;
     padding: 6pt 10pt;
     border-bottom: 1px solid #D6D3D1;
+    /* Keep heading with first field */
+    break-after: avoid;
+    page-break-after: avoid;
   }
   .card-title { font-size: 10pt; font-weight: 600; }
   .part-tag   { font-size: 6.5pt; }
 
   .card-body  { padding: 8pt 10pt; gap: 8pt; }
 
-  /* Fields */
+  /* Fields — avoid breaking a label from its input, but allow break after */
+  .field {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin-bottom: 6pt;
+  }
+
+  /* Fields with long textareas get a special class added by JS to allow breaking */
+  .field.allow-break {
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+
+  /* Labels and hints */
   .field-label { font-size: 8pt; font-weight: 600; margin-bottom: 1pt; }
   .field-hint  { font-size: 7.5pt; color: #78716C; margin-bottom: 3pt; }
 
-  /* Text inputs — show as styled boxes */
-  input[type="text"],
+  /* Text inputs */
+  input[type="text"] {
+    border: 1px solid #D6D3D1;
+    border-radius: 4pt;
+    padding: 4pt 6pt;
+    font-size: 8.5pt;
+    background: #FAFAF7 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    width: 100%;
+    display: block;
+  }
+
+  /* Textareas — critical: must expand fully, never clip */
   textarea {
     border: 1px solid #D6D3D1;
     border-radius: 4pt;
@@ -308,22 +335,28 @@ textarea { min-height: 78px; overflow: hidden; }
     background: #FAFAF7 !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
-    /* CRITICAL: let text areas expand to fit content — no overflow cuts */
+    /* Let height be determined by content only */
+    width: 100%;
     height: auto !important;
     min-height: 0 !important;
+    max-height: none !important;
     overflow: visible !important;
-    white-space: pre-wrap;
-    word-break: break-word;
-    /* Prevent box from being split across pages */
-    break-inside: avoid;
-    page-break-inside: avoid;
+    /* Ensure text wraps and never overflows horizontally */
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    word-break: normal !important;
+    display: block;
+    /* Allow page breaks inside long responses */
+    break-inside: auto;
+    page-break-inside: auto;
   }
 
   /* Grid collapses to single col on print */
   .two-col { grid-template-columns: 1fr; gap: 6pt; }
 
-  /* Radio pills — show selected visually */
-  .radio-row { gap: 4pt; margin-bottom: 4pt; }
+  /* Radio pills */
+  .radio-row { gap: 4pt; margin-bottom: 4pt; break-inside: avoid; page-break-inside: avoid; }
   .radio-pill {
     font-size: 7.5pt;
     padding: 2pt 7pt;
@@ -351,11 +384,38 @@ textarea { min-height: 78px; overflow: hidden; }
     -webkit-print-color-adjust: exact; print-color-adjust: exact;
   }
 
-  /* Rating rows — allow break between individual rows but not inside them */
-  .rating-row { break-inside: avoid; page-break-inside: avoid; }
+  /* Proxy divs replace textareas/inputs at print time */
+  .print-text-proxy {
+    border: 1px solid #D6D3D1;
+    border-radius: 4pt;
+    padding: 4pt 6pt;
+    font-size: 8.5pt;
+    font-family: 'DM Sans', sans-serif;
+    background: #FAFAF7 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    width: 100%;
+    display: block;
+    min-height: 14pt;
+    line-height: 1.5;
+    color: #1C1917;
+  }
+  .print-text-proxy--inline {
+    min-height: 12pt;
+  }
+  /* Hide the real form controls — proxies take their place */
+  textarea, input[type="text"] {
+    display: none !important;
+  }
 
-  /* Each field block shouldn't be split */
-  .field { break-inside: avoid; page-break-inside: avoid; }
+  /* Rating rows — keep each row together */
+  .rating-row { break-inside: avoid; page-break-inside: avoid; }
+  .ratings-table { break-inside: auto; page-break-inside: auto; }
+  .scale-labels { break-inside: avoid; page-break-inside: avoid; }
+  .scale-row { break-inside: avoid; page-break-inside: avoid; }
 }
 </style>
 </head>
@@ -854,15 +914,43 @@ document.querySelectorAll('input[type="radio"]').forEach(function(el) {
   el.addEventListener('change', function() { save(); updateProgress(); });
 });
 
+/* ── Print helpers: swap textareas for divs so height is natural ── */
+function prepareForPrint() {
+  document.querySelectorAll('textarea').forEach(function(ta) {
+    var div = document.createElement('div');
+    div.className = 'print-text-proxy';
+    div.textContent = ta.value || '';
+    ta.parentNode.insertBefore(div, ta);
+    ta.style.display = 'none';
+  });
+  document.querySelectorAll('input[type="text"]').forEach(function(inp) {
+    var div = document.createElement('div');
+    div.className = 'print-text-proxy print-text-proxy--inline';
+    div.textContent = inp.value || '';
+    inp.parentNode.insertBefore(div, inp);
+    inp.style.display = 'none';
+  });
+}
+
+function restoreAfterPrint() {
+  document.querySelectorAll('.print-text-proxy').forEach(function(div) {
+    div.parentNode.removeChild(div);
+  });
+  document.querySelectorAll('textarea, input[type="text"]').forEach(function(el) {
+    el.style.display = '';
+  });
+}
+
+window.addEventListener('beforeprint', prepareForPrint);
+window.addEventListener('afterprint',  restoreAfterPrint);
+
 /* ── Export PDF ── */
 function exportPDF() {
   var hint = document.getElementById('print-hint');
   hint.style.display = 'block';
   document.getElementById('export-btn').disabled = true;
-  // Small delay so the hint renders before print dialog opens
   setTimeout(function() {
     window.print();
-    // Reset after dialog closes
     setTimeout(function() {
       hint.style.display = 'none';
       document.getElementById('export-btn').disabled = false;
