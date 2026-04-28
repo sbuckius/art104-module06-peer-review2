@@ -3,14 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Peer Review #2 — Fleshed-Out Project</title>
+<title>Peer Review #2 — Fleshed-Out Project (No Tech Section)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
 <style>
-/* ═══════════════════════════════════════════
-   SCREEN STYLES
-═══════════════════════════════════════════ */
 :root {
   --ink:        #1C1917;
   --ink-2:      #44403C;
@@ -22,6 +19,9 @@
   --rule:       #E2DDD6;
   --accent:     #0F766E;
   --accent-bg:  #CCFBF1;
+  --suggest:    #7C3AED;
+  --suggest-bg: #F5F3FF;
+  --suggest-rule: #DDD6FE;
   --warn:       #92400E;
   --warn-bg:    #FEF9EC;
   --warn-rule:  #FDE68A;
@@ -51,7 +51,6 @@ body::before {
   z-index: 0;
 }
 
-/* ── Header ── */
 .site-header {
   background: var(--ink);
   color: #FAFAF7;
@@ -59,7 +58,6 @@ body::before {
   position: relative;
   overflow: hidden;
 }
-
 .site-header::after {
   content: 'PEER\AREVIEW';
   white-space: pre;
@@ -74,9 +72,7 @@ body::before {
   pointer-events: none;
   letter-spacing: -.02em;
 }
-
 .header-inner { max-width: 760px; margin: 0 auto; position: relative; z-index: 1; }
-
 .header-eyebrow {
   font-size: .7rem; font-weight: 500; letter-spacing: .14em;
   text-transform: uppercase; color: #A8A29E; margin-bottom: .5rem;
@@ -108,11 +104,22 @@ body::before {
   display: flex; gap: .75rem; align-items: flex-start;
   background: var(--warn-bg); border: 1px solid var(--warn-rule);
   border-left: 3px solid #F59E0B; border-radius: var(--radius-sm);
-  padding: .875rem 1rem; margin-bottom: 1.75rem;
+  padding: .875rem 1rem; margin-bottom: 1.25rem;
 }
 .notice-icon { flex-shrink: 0; width: 16px; height: 16px; margin-top: 2px; color: #B45309; }
 .notice p { font-size: .82rem; color: var(--warn); line-height: 1.55; }
 .notice strong { font-weight: 500; }
+
+/* ── Legend ── */
+.legend-notice {
+  display: flex; gap: .75rem; align-items: flex-start;
+  background: var(--suggest-bg); border: 1px solid var(--suggest-rule);
+  border-left: 3px solid var(--suggest); border-radius: var(--radius-sm);
+  padding: .875rem 1rem; margin-bottom: 1.75rem;
+}
+.legend-icon { flex-shrink: 0; width: 16px; height: 16px; margin-top: 2px; color: var(--suggest); }
+.legend-notice p { font-size: .82rem; color: var(--suggest); line-height: 1.55; }
+.legend-notice strong { font-weight: 500; }
 
 /* ── Progress ── */
 .autosave-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
@@ -170,6 +177,30 @@ input[type="text"]:focus, textarea:focus {
 }
 textarea { min-height: 78px; overflow: hidden; }
 
+/* ── Suggestion block ── */
+.suggest-block {
+  background: var(--suggest-bg);
+  border: 1px solid var(--suggest-rule);
+  border-radius: var(--radius-sm);
+  padding: .75rem .875rem;
+  margin-top: .5rem;
+}
+.suggest-label {
+  display: flex; align-items: center; gap: .4rem;
+  font-size: .78rem; font-weight: 500; color: var(--suggest); margin-bottom: .4rem; letter-spacing: .01em;
+}
+.suggest-label svg { flex-shrink: 0; }
+.suggest-block textarea {
+  background: #fff;
+  border-color: var(--suggest-rule);
+  font-size: .83rem;
+  min-height: 60px;
+}
+.suggest-block textarea:focus {
+  border-color: var(--suggest);
+  box-shadow: 0 0 0 3px rgba(124,58,237,.08);
+}
+
 /* ── Radio pills ── */
 .radio-row { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: .6rem; }
 .radio-pill {
@@ -202,6 +233,13 @@ textarea { min-height: 78px; overflow: hidden; }
 .scale-btn.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
 .scale-labels { display: flex; justify-content: space-between; font-size: .72rem; color: var(--ink-4); padding: 0 2px; }
 
+/* ── Low-score suggestion reveal ── */
+.low-score-suggest {
+  display: none;
+  margin-top: .75rem;
+}
+.low-score-suggest.visible { display: block; }
+
 /* ── Actions ── */
 .actions {
   display: flex; gap: .75rem; align-items: center; margin-top: 2rem;
@@ -226,192 +264,123 @@ textarea { min-height: 78px; overflow: hidden; }
 
 /* ═══════════════════════════════════════════
    PRINT / PDF STYLES
-   All word-cutoff fixes live here.
 ═══════════════════════════════════════════ */
 @media print {
-  @page {
-    size: letter;
-    margin: 18mm 16mm 18mm 16mm;
-  }
+  @page { size: letter; margin: 18mm 16mm 18mm 16mm; }
 
-  /* Reset screen chrome */
-  body::before           { display: none; }
-  .site-header::after    { display: none; }
-  .autosave-bar          { display: none; }
-  .notice                { display: none; }
-  .actions               { display: none; }
-  .btn                   { display: none; }
+  body::before        { display: none; }
+  .site-header::after { display: none; }
+  .autosave-bar       { display: none; }
+  .notice             { display: none; }
+  .legend-notice      { display: none; }
+  .actions            { display: none; }
+  .btn                { display: none; }
 
   body {
-    background: #fff;
-    color: #000;
-    font-size: 9.5pt;
-    line-height: 1.5;
+    background: #fff; color: #000;
+    font-size: 9.5pt; line-height: 1.5;
     font-family: 'DM Sans', sans-serif;
   }
 
-  /* Header */
   .site-header {
     background: #1C1917 !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-    color: #fff !important;
-    padding: 14pt 16pt 12pt;
-    margin-bottom: 14pt;
-    border-radius: 0;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    color: #fff !important; padding: 14pt 16pt 12pt; margin-bottom: 14pt; border-radius: 0;
   }
   .header-eyebrow { color: #A8A29E !important; font-size: 7pt; }
   .header-title   { font-size: 18pt; color: #fff !important; }
   .header-sub     { color: #A8A29E !important; font-size: 8.5pt; }
   .header-badge   { background: #0F766E !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
-  .main {
-    padding: 0;
-    max-width: 100%;
-  }
+  .main { padding: 0; max-width: 100%; }
 
-  /* Cards — allow breaking across pages so content is never clipped */
   .card {
-    border: 1px solid #D6D3D1;
-    border-radius: 6pt;
-    margin-bottom: 10pt;
-    box-shadow: none;
-    animation: none;
-    break-inside: auto;
-    page-break-inside: auto;
+    border: 1px solid #D6D3D1; border-radius: 6pt;
+    margin-bottom: 10pt; box-shadow: none; animation: none;
+    break-inside: auto; page-break-inside: auto;
   }
-
   .card-head {
     background: #F5F3EE !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-    padding: 6pt 10pt;
-    border-bottom: 1px solid #D6D3D1;
-    /* Keep heading with first field */
-    break-after: avoid;
-    page-break-after: avoid;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    padding: 6pt 10pt; border-bottom: 1px solid #D6D3D1;
+    break-after: avoid; page-break-after: avoid;
   }
   .card-title { font-size: 10pt; font-weight: 600; }
   .part-tag   { font-size: 6.5pt; }
-
   .card-body  { padding: 8pt 10pt; gap: 8pt; }
 
-  /* Fields — avoid breaking a label from its input, but allow break after */
-  .field {
-    break-inside: avoid;
-    page-break-inside: avoid;
-    margin-bottom: 6pt;
-  }
+  .field { break-inside: avoid; page-break-inside: avoid; margin-bottom: 6pt; }
+  .field.allow-break { break-inside: auto; page-break-inside: auto; }
 
-  /* Fields with long textareas get a special class added by JS to allow breaking */
-  .field.allow-break {
-    break-inside: auto;
-    page-break-inside: auto;
-  }
-
-  /* Labels and hints */
   .field-label { font-size: 8pt; font-weight: 600; margin-bottom: 1pt; }
   .field-hint  { font-size: 7.5pt; color: #78716C; margin-bottom: 3pt; }
 
-  /* Text inputs */
   input[type="text"] {
-    border: 1px solid #D6D3D1;
-    border-radius: 4pt;
-    padding: 4pt 6pt;
-    font-size: 8.5pt;
-    background: #FAFAF7 !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-    width: 100%;
-    display: block;
+    border: 1px solid #D6D3D1; border-radius: 4pt; padding: 4pt 6pt; font-size: 8.5pt;
+    background: #FAFAF7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    width: 100%; display: block;
   }
-
-  /* Textareas — critical: must expand fully, never clip */
   textarea {
-    border: 1px solid #D6D3D1;
-    border-radius: 4pt;
-    padding: 4pt 6pt;
-    font-size: 8.5pt;
-    background: #FAFAF7 !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-    /* Let height be determined by content only */
-    width: 100%;
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    overflow: visible !important;
-    /* Ensure text wraps and never overflows horizontally */
-    white-space: pre-wrap !important;
-    word-wrap: break-word !important;
-    overflow-wrap: break-word !important;
-    word-break: normal !important;
-    display: block;
-    /* Allow page breaks inside long responses */
-    break-inside: auto;
-    page-break-inside: auto;
+    border: 1px solid #D6D3D1; border-radius: 4pt; padding: 4pt 6pt; font-size: 8.5pt;
+    background: #FAFAF7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    width: 100%; height: auto !important; min-height: 0 !important; max-height: none !important;
+    overflow: visible !important; white-space: pre-wrap !important;
+    word-wrap: break-word !important; overflow-wrap: break-word !important;
+    word-break: normal !important; display: block;
+    break-inside: auto; page-break-inside: auto;
   }
 
-  /* Grid collapses to single col on print */
+  .suggest-block {
+    background: #F5F3FF !important; border: 1px solid #DDD6FE !important;
+    border-left: 2pt solid #7C3AED !important;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    border-radius: 4pt; padding: 5pt 7pt; margin-top: 4pt;
+    break-inside: avoid; page-break-inside: avoid;
+  }
+  .suggest-label { font-size: 7.5pt; color: #7C3AED !important; margin-bottom: 2pt; }
+  .suggest-block textarea {
+    background: #fff !important; border-color: #DDD6FE !important;
+    font-size: 8pt;
+  }
+
+  /* Show suggest blocks even when empty in print */
+  .low-score-suggest { display: block !important; }
+
   .two-col { grid-template-columns: 1fr; gap: 6pt; }
 
-  /* Radio pills */
   .radio-row { gap: 4pt; margin-bottom: 4pt; break-inside: avoid; page-break-inside: avoid; }
   .radio-pill {
-    font-size: 7.5pt;
-    padding: 2pt 7pt;
-    border: 1px solid #D6D3D1;
-    background: #F5F3EE !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+    font-size: 7.5pt; padding: 2pt 7pt; border: 1px solid #D6D3D1;
+    background: #F5F3EE !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
   }
   .radio-pill:has(input:checked) {
-    background: #CCFBF1 !important;
-    border-color: #0F766E !important;
-    color: #0F766E !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+    background: #CCFBF1 !important; border-color: #0F766E !important; color: #0F766E !important;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
   }
 
-  /* Stars */
   .star { font-size: 11pt; }
   .star.active { color: #D97706 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-
-  /* Scale buttons */
   .scale-btn { width: 26pt; height: 26pt; font-size: 8pt; }
   .scale-btn.active {
     background: #CCFBF1 !important; border-color: #0F766E !important; color: #0F766E !important;
     -webkit-print-color-adjust: exact; print-color-adjust: exact;
   }
 
-  /* Proxy divs replace textareas/inputs at print time */
   .print-text-proxy {
-    border: 1px solid #D6D3D1;
-    border-radius: 4pt;
-    padding: 4pt 6pt;
-    font-size: 8.5pt;
-    font-family: 'DM Sans', sans-serif;
-    background: #FAFAF7 !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    width: 100%;
-    display: block;
-    min-height: 14pt;
-    line-height: 1.5;
-    color: #1C1917;
+    border: 1px solid #D6D3D1; border-radius: 4pt; padding: 4pt 6pt; font-size: 8.5pt;
+    font-family: 'DM Sans', sans-serif; background: #FAFAF7 !important;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word;
+    width: 100%; display: block; min-height: 14pt; line-height: 1.5; color: #1C1917;
   }
-  .print-text-proxy--inline {
-    min-height: 12pt;
+  .print-text-proxy--inline { min-height: 12pt; }
+  .suggest-print-proxy {
+    font-family: 'DM Sans', sans-serif; font-size: 8pt; color: #4C1D95;
+    white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word;
+    width: 100%; display: block; min-height: 10pt; line-height: 1.5;
   }
-  /* Hide the real form controls — proxies take their place */
-  textarea, input[type="text"] {
-    display: none !important;
-  }
+  textarea, input[type="text"] { display: none !important; }
 
-  /* Rating rows — keep each row together */
   .rating-row { break-inside: avoid; page-break-inside: avoid; }
   .ratings-table { break-inside: auto; page-break-inside: auto; }
   .scale-labels { break-inside: avoid; page-break-inside: avoid; }
@@ -437,6 +406,13 @@ textarea { min-height: 78px; overflow: hidden; }
       <path d="M8 5v3.5M8 10.5v.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
     </svg>
     <p><strong>Heads up about saving:</strong> Responses are saved to <strong>this browser only</strong>. Switching browsers or devices will not carry over your progress. Use the <strong>Export PDF</strong> button before closing the page to keep a permanent copy.</p>
+  </div>
+
+  <div class="legend-notice">
+    <svg class="legend-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M8 2L9.5 6h4L10 8.5l1.5 4.5L8 10.5 4.5 13 6 8.5 2.5 6h4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+    </svg>
+    <p><strong>Suggestions:</strong> Throughout this form, purple <em>Suggest an improvement</em> boxes appear wherever you identify an issue. Use them to give the author something concrete and actionable — not just what's wrong, but what to do about it.</p>
   </div>
 
   <div class="autosave-bar">
@@ -488,6 +464,13 @@ textarea { min-height: 78px; overflow: hidden; }
           <label class="radio-pill"><input type="radio" name="thesis-clarity" value="missing">Not present</label>
         </div>
         <textarea id="q-thesis" placeholder="Write the thesis as you understand it. How could it be made more specific or focused?"></textarea>
+        <div class="suggest-block" id="suggest-thesis-wrap">
+          <div class="suggest-label">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8 2L9.5 6h4L10 8.5l1.5 4.5L8 10.5 4.5 13 6 8.5 2.5 6h4L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Suggest an improvement
+          </div>
+          <textarea id="sug-thesis" placeholder="What specifically should the author do to strengthen the thesis? (e.g. 'Narrow the claim to focus on X rather than Y' or 'Add a reason why this matters to digital media art')"></textarea>
+        </div>
       </div>
     </div>
   </div>
@@ -503,11 +486,25 @@ textarea { min-height: 78px; overflow: hidden; }
         <label class="field-label" for="q-main-ideas">Main ideas and section focus</label>
         <p class="field-hint">Does each section of the project have one clear main idea? Is it clear what each section will discuss and why it matters to the project as a whole? Is the order logical?</p>
         <textarea id="q-main-ideas" placeholder="List the main ideas as you understand them from the project. Are any sections vague or trying to cover too much?"></textarea>
+        <div class="suggest-block">
+          <div class="suggest-label">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8 2L9.5 6h4L10 8.5l1.5 4.5L8 10.5 4.5 13 6 8.5 2.5 6h4L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Suggest an improvement
+          </div>
+          <textarea id="sug-main-ideas" placeholder="If any sections are unclear or unfocused, what would you recommend? (e.g. 'Section 2 covers too much — split into two focused sections' or 'Move the technology section earlier so it sets up the artwork analysis')"></textarea>
+        </div>
       </div>
       <div class="field">
         <label class="field-label" for="q-cohesion">Cohesion within each theme</label>
         <p class="field-hint">Within each theme, do the artworks, sources, and ideas hold together? Or does a theme mix ideas that don't quite belong with each other? Go through each theme and consider whether everything in it is pointing in the same direction.</p>
         <textarea id="q-cohesion" placeholder="For each theme, does everything in it — the artworks, sources, and ideas — feel like it belongs together? Note any themes where the content feels scattered or pulls in different directions."></textarea>
+        <div class="suggest-block">
+          <div class="suggest-label">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8 2L9.5 6h4L10 8.5l1.5 4.5L8 10.5 4.5 13 6 8.5 2.5 6h4L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Suggest an improvement
+          </div>
+          <textarea id="sug-cohesion" placeholder="For any theme that feels scattered, what would bring it together? (e.g. 'Remove the source about X from Theme 2 — it fits better in Theme 3' or 'The two artworks in Theme 1 need an explicit sentence connecting them to the same idea')"></textarea>
+        </div>
       </div>
       <div class="field">
         <label class="field-label">Overall focus and clarity</label>
@@ -520,7 +517,14 @@ textarea { min-height: 78px; overflow: hidden; }
           <button class="scale-btn" data-v="5">5</button>
         </div>
         <div class="scale-labels"><span>Needs significant work</span><span>Clear and focused</span></div>
-        <textarea id="q-argument-strength" placeholder="What is the clearest, most developed part of the project? What feels underdeveloped or unclear?"></textarea>
+        <textarea id="q-argument-strength" placeholder="What is the clearest, most developed part of the project? What feels underdeveloped or unclear?" style="margin-top:.75rem"></textarea>
+        <div class="suggest-block low-score-suggest" id="sug-argument-wrap">
+          <div class="suggest-label">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8 2L9.5 6h4L10 8.5l1.5 4.5L8 10.5 4.5 13 6 8.5 2.5 6h4L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Suggest an improvement
+          </div>
+          <textarea id="sug-argument" placeholder="What concrete steps would most improve the project's focus? (e.g. 'Write a clearer topic sentence at the start of each section' or 'Cut the tangent about X and replace it with analysis of how this connects to the speculative piece')"></textarea>
+        </div>
       </div>
     </div>
   </div>
@@ -540,61 +544,61 @@ textarea { min-height: 78px; overflow: hidden; }
           <label class="radio-pill"><input type="radio" name="artwork-count" value="1">Only 1</label>
           <label class="radio-pill"><input type="radio" name="artwork-count" value="0">None</label>
         </div>
+        <div class="suggest-block" id="sug-artwork-count-wrap">
+          <div class="suggest-label">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8 2L9.5 6h4L10 8.5l1.5 4.5L8 10.5 4.5 13 6 8.5 2.5 6h4L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Suggest an improvement
+          </div>
+          <textarea id="sug-artwork-count" placeholder="If there aren't enough artworks, suggest what additional works might fit — or which existing artworks could each be split into more focused discussions."></textarea>
+        </div>
       </div>
       <div class="field">
         <label class="field-label" for="q-artwork-describe">Description and planned analysis</label>
         <p class="field-hint">Does the project indicate that artworks will be described in enough detail? Is there a plan for genuine visual analysis — not just summarizing what the work is?</p>
         <textarea id="q-artwork-describe" placeholder="Can you tell what the artworks are and how they will be discussed? Is any artwork described too vaguely to understand?"></textarea>
+        <div class="suggest-block">
+          <div class="suggest-label">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8 2L9.5 6h4L10 8.5l1.5 4.5L8 10.5 4.5 13 6 8.5 2.5 6h4L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Suggest an improvement
+          </div>
+          <textarea id="sug-artwork-describe" placeholder="For any artwork that's described vaguely, what would stronger analysis look like? (e.g. 'For [artwork], describe the specific visual elements and explain how the technology shapes the viewer's experience' or 'Go beyond summarizing the topic — analyze what formal choices the artist made and why')"></textarea>
+        </div>
       </div>
       <div class="field">
         <label class="field-label" for="q-artwork-connect">Connection to the project's ideas</label>
         <p class="field-hint">Are the artworks clearly linked to the project's central ideas — or just listed? Does each artwork appear to illuminate something meaningful about the project's themes?</p>
         <textarea id="q-artwork-connect" placeholder="How effectively are the artworks tied to the project's ideas? Are any artworks present but underconnected?"></textarea>
+        <div class="suggest-block">
+          <div class="suggest-label">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8 2L9.5 6h4L10 8.5l1.5 4.5L8 10.5 4.5 13 6 8.5 2.5 6h4L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Suggest an improvement
+          </div>
+          <textarea id="sug-artwork-connect" placeholder="For any artwork that feels disconnected, how could its relevance be made explicit? (e.g. 'Add a sentence after describing [artwork] that explains what it reveals about [theme]' or 'This artwork seems to be about X — either connect it to the thesis or replace it with something more directly related')"></textarea>
+        </div>
       </div>
       <div class="field">
         <label class="field-label" for="q-artwork-spec-link">Connection to the speculative artwork</label>
         <p class="field-hint">Do each of the artworks discussed relate directly to the speculative artwork? Can you see a clear line from each artwork to the speculative piece — in terms of theme, medium, or idea?</p>
         <textarea id="q-artwork-spec-link" placeholder="For each artwork in the project, does it have a clear connection to the speculative artwork? Which artworks feel disconnected from it?"></textarea>
+        <div class="suggest-block">
+          <div class="suggest-label">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8 2L9.5 6h4L10 8.5l1.5 4.5L8 10.5 4.5 13 6 8.5 2.5 6h4L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Suggest an improvement
+          </div>
+          <textarea id="sug-artwork-spec-link" placeholder="For any artwork without a clear link to the speculative piece, what could the author do? (e.g. 'Add a closing sentence to [artwork]'s section explaining how it directly informs the speculative piece' or 'Consider replacing [artwork] with a work that uses the same medium as the speculative proposal')"></textarea>
+        </div>
       </div>
       <div class="field">
         <label class="field-label" for="q-artwork-selection">Artwork selection</label>
         <p class="field-hint">Are the chosen artworks appropriate and relevant? Do they genuinely support the project's focus or feel loosely connected?</p>
         <textarea id="q-artwork-selection" placeholder="Are the artworks well-chosen for this project? Would different examples be stronger?"></textarea>
-      </div>
-    </div>
-  </div>
-
-  <!-- ⑤ Technology & Digital Media -->
-  <div class="card">
-    <div class="card-head">
-      <h2 class="card-title">Technology and digital media</h2>
-      <span class="part-tag">Part 3 cont.</span>
-    </div>
-    <div class="card-body">
-      <div class="field">
-        <label class="field-label" for="q-tech-explained">Technology explanation</label>
-        <p class="field-hint">Is the technology (e.g. AI, AR, VR, generative systems, networks, etc.) identified and explained in the project? Does the plan indicate it will be explained clearly enough for a non-specialist?</p>
-        <textarea id="q-tech-explained" placeholder="Is the technology clearly named and contextualized in the project? What is still unclear?"></textarea>
-      </div>
-      <div class="field">
-        <label class="field-label" for="q-tech-integrated">Integration into the project's ideas</label>
-        <p class="field-hint">Does the project weave the technology into its discussions of artworks and ideas — or is it treated as a standalone explainer section? Does understanding the technology feel essential to understanding the project?</p>
-        <textarea id="q-tech-integrated" placeholder="Does the technology feel central to the project's ideas, or does it feel like a separate section that could be cut?"></textarea>
-      </div>
-      <div class="field">
-        <label class="field-label" for="q-tech-spec-link">Connection to the speculative artwork</label>
-        <p class="field-hint">Does the technology discussed relate directly to the speculative artwork proposed? Is it clear how the technology informs or enables the speculative piece?</p>
-        <textarea id="q-tech-spec-link" placeholder="Does the technology in the project connect logically to the speculative artwork? Is that connection made explicit?"></textarea>
-      </div>
-      <div class="field">
-        <label class="field-label">Digital media concepts</label>
-        <p class="field-hint">Are key digital media concepts (e.g. interactivity, virtuality, data, code, networked culture) engaged with meaningfully in the project?</p>
-        <div class="radio-row">
-          <label class="radio-pill"><input type="radio" name="dm-concepts" value="strong">Clearly present</label>
-          <label class="radio-pill"><input type="radio" name="dm-concepts" value="partial">Touched on</label>
-          <label class="radio-pill"><input type="radio" name="dm-concepts" value="missing">Needs more</label>
+        <div class="suggest-block">
+          <div class="suggest-label">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8 2L9.5 6h4L10 8.5l1.5 4.5L8 10.5 4.5 13 6 8.5 2.5 6h4L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Suggest an improvement
+          </div>
+          <textarea id="sug-artwork-selection" placeholder="If the artwork selection feels weak, what kind of work would be stronger? (e.g. 'Look for a work that uses [medium] and engages with [theme] more directly' or 'The current artworks are all from the same era — adding one from a different time period would strengthen the project's historical context')"></textarea>
         </div>
-        <textarea id="q-dm-concepts" placeholder="Which digital media concepts are engaged with? What could be developed more?"></textarea>
       </div>
     </div>
   </div>
@@ -615,21 +619,49 @@ textarea { min-height: 78px; overflow: hidden; }
           <label class="radio-pill"><input type="radio" name="sources-req" value="unmet">Not yet met</label>
         </div>
         <textarea id="q-sources-req" placeholder="List the sources identified in the project. Note which appear to be peer-reviewed and which don't qualify."></textarea>
+        <div class="suggest-block" id="sug-sources-req-wrap">
+          <div class="suggest-label">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8 2L9.5 6h4L10 8.5l1.5 4.5L8 10.5 4.5 13 6 8.5 2.5 6h4L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Suggest an improvement
+          </div>
+          <textarea id="sug-sources-req" placeholder="What kind of source is missing, and where could the author look? (e.g. 'You need at least one more peer-reviewed source — try searching [journal/database] for articles on [relevant topic]' or 'The outside-field source should come from a non-art discipline — consider looking for cognitive science or sociology research related to your theme')"></textarea>
+        </div>
       </div>
       <div class="field">
         <label class="field-label" for="q-evidence-use">Planned use of sources</label>
         <p class="field-hint">Does the project show where sources will be used to support or develop specific ideas? Is it clear how each source connects to the project's themes — or are they just listed?</p>
         <textarea id="q-evidence-use" placeholder="Does the project indicate how sources will be used? Are there sections where sources appear without a clear connection to the ideas?"></textarea>
+        <div class="suggest-block">
+          <div class="suggest-label">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8 2L9.5 6h4L10 8.5l1.5 4.5L8 10.5 4.5 13 6 8.5 2.5 6h4L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Suggest an improvement
+          </div>
+          <textarea id="sug-evidence-use" placeholder="For sources that feel disconnected from the ideas, how could they be integrated better? (e.g. 'Source X is listed but never tied to a specific argument — add a sentence explaining what claim it supports' or 'Consider using [source] to open Section 2 rather than dropping it in at the end')"></textarea>
+        </div>
       </div>
       <div class="field">
         <label class="field-label" for="q-articles-spec-link">Connection of articles to the speculative artwork</label>
         <p class="field-hint">Do the articles and outside-field sources relate directly to the speculative artwork — not just to the artworks discussed? Is it clear how the research informs the proposed speculative piece?</p>
         <textarea id="q-articles-spec-link" placeholder="Which articles connect clearly to the speculative artwork? Which feel relevant only to the other artworks or topics but not to the speculative piece?"></textarea>
+        <div class="suggest-block">
+          <div class="suggest-label">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8 2L9.5 6h4L10 8.5l1.5 4.5L8 10.5 4.5 13 6 8.5 2.5 6h4L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Suggest an improvement
+          </div>
+          <textarea id="sug-articles-spec-link" placeholder="For sources that don't connect clearly to the speculative artwork, what would fix this? (e.g. 'Add a sentence in the speculative artwork section explaining how the findings from [source] directly inform the design choices' or 'Find an additional source that addresses [specific aspect of your speculative piece] more directly')"></textarea>
+        </div>
       </div>
       <div class="field">
         <label class="field-label" for="q-outside-field">Outside-field sources</label>
         <p class="field-hint">Are the non-art sources genuinely from a different discipline — and do they appear to meaningfully enrich the project's ideas rather than just being cited?</p>
         <textarea id="q-outside-field" placeholder="What non-art sources are identified? How well do they seem to contribute to the project's ideas?"></textarea>
+        <div class="suggest-block">
+          <div class="suggest-label">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8 2L9.5 6h4L10 8.5l1.5 4.5L8 10.5 4.5 13 6 8.5 2.5 6h4L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Suggest an improvement
+          </div>
+          <textarea id="sug-outside-field" placeholder="If the outside-field source feels forced or superficial, what would work better? (e.g. 'The current non-art source seems loosely connected — look for research in [field] that speaks more directly to [specific aspect of your project]' or 'Use this source to open a discussion rather than just citing a statistic — explain what the research actually found and why it matters for your argument')"></textarea>
+        </div>
       </div>
       <div class="field">
         <label class="field-label">Citation formatting</label>
@@ -640,6 +672,13 @@ textarea { min-height: 78px; overflow: hidden; }
           <label class="radio-pill"><input type="radio" name="citations" value="needs-work">Needs work</label>
         </div>
         <textarea id="q-citations" placeholder="Note any specific citation formatting issues (missing authors, wrong format, incomplete entries, etc.)."></textarea>
+        <div class="suggest-block" id="sug-citations-wrap">
+          <div class="suggest-label">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8 2L9.5 6h4L10 8.5l1.5 4.5L8 10.5 4.5 13 6 8.5 2.5 6h4L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Suggest an improvement
+          </div>
+          <textarea id="sug-citations" placeholder="Point to the specific issues and how to fix them. (e.g. 'The in-text citations are missing page numbers for direct quotes — add them in the format (Author Year:Page)' or 'The reference list entries for online sources are missing access dates and URLs — check the ASA format guide for the correct structure')"></textarea>
+        </div>
       </div>
     </div>
   </div>
@@ -658,21 +697,49 @@ textarea { min-height: 78px; overflow: hidden; }
           <label class="radio-pill"><input type="radio" name="spec-present" value="missing">Missing</label>
         </div>
         <textarea id="q-spec-concept" placeholder="Describe the proposed artwork in your own words. How effectively does it bring together the project's ideas?"></textarea>
+        <div class="suggest-block" id="sug-spec-concept-wrap">
+          <div class="suggest-label">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8 2L9.5 6h4L10 8.5l1.5 4.5L8 10.5 4.5 13 6 8.5 2.5 6h4L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Suggest an improvement
+          </div>
+          <textarea id="sug-spec-concept" placeholder="How could the speculative artwork concept be developed more fully? (e.g. 'Describe what a viewer would actually experience when encountering this work — not just what it is, but how it feels' or 'Explain what specific problem or question this artwork is responding to, and tie that explicitly back to the thesis')"></textarea>
+        </div>
       </div>
       <div class="field">
         <label class="field-label" for="q-themes-spec-link">Do all three themes connect to the speculative artwork?</label>
         <p class="field-hint">The project should have three main themes or body sections. Does each theme relate directly to the speculative artwork — not just to the other artworks discussed? Can you trace a clear line from each theme to the speculative piece?</p>
         <textarea id="q-themes-spec-link" placeholder="Go through each of the three themes. For each one, does it directly support or relate to the speculative artwork? Which themes feel connected and which feel like they could exist without the speculative piece?"></textarea>
+        <div class="suggest-block">
+          <div class="suggest-label">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8 2L9.5 6h4L10 8.5l1.5 4.5L8 10.5 4.5 13 6 8.5 2.5 6h4L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Suggest an improvement
+          </div>
+          <textarea id="sug-themes-spec-link" placeholder="For any theme that feels disconnected from the speculative artwork, what would fix this? (e.g. 'At the end of Theme 2, add a paragraph explaining how the ideas in this section directly informed a specific design decision in the speculative piece' or 'Theme 3 covers X, but the speculative piece doesn't seem to use X — either revise the artwork description or change the theme's focus')"></textarea>
+        </div>
       </div>
       <div class="field">
         <label class="field-label" for="q-spec-connection">Connection to thesis and body artworks</label>
         <p class="field-hint">Does the speculative artwork feel like a logical extension of the artworks and ideas in the project? Is its connection to the thesis explicit?</p>
         <textarea id="q-spec-connection" placeholder="How well does the speculative artwork tie back to the project's central ideas and the artworks discussed?"></textarea>
+        <div class="suggest-block">
+          <div class="suggest-label">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8 2L9.5 6h4L10 8.5l1.5 4.5L8 10.5 4.5 13 6 8.5 2.5 6h4L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Suggest an improvement
+          </div>
+          <textarea id="sug-spec-connection" placeholder="How could the connection to the thesis and body artworks be made more explicit? (e.g. 'Reference at least two of the artworks discussed in the body when introducing the speculative piece, explaining what you are building on or responding to' or 'Rewrite the opening of the speculative artwork section so it directly echoes the thesis statement')"></textarea>
+        </div>
       </div>
       <div class="field">
         <label class="field-label" for="q-spec-tech">Technology and medium</label>
         <p class="field-hint">Is the technology or medium for the speculative artwork clearly described in the project? Is it clear what kind of artwork this would be?</p>
         <textarea id="q-spec-tech" placeholder="Is it clear what this artwork would be made of or how it would work?"></textarea>
+        <div class="suggest-block">
+          <div class="suggest-label">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8 2L9.5 6h4L10 8.5l1.5 4.5L8 10.5 4.5 13 6 8.5 2.5 6h4L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Suggest an improvement
+          </div>
+          <textarea id="sug-spec-tech" placeholder="If the medium or technology is unclear, what level of detail would help? (e.g. 'Specify the exact technology — is this a mobile app, an installation, a web platform? Describe the hardware and software involved' or 'Explain how the viewer interacts with the piece from start to finish')"></textarea>
+        </div>
       </div>
       <div class="field">
         <label class="field-label">Sketches per group member</label>
@@ -683,6 +750,13 @@ textarea { min-height: 78px; overflow: hidden; }
           <label class="radio-pill"><input type="radio" name="sketches" value="no">Missing or insufficient</label>
         </div>
         <textarea id="q-sketches" placeholder="How many sketches are included? Do they adequately represent each group member's contribution?"></textarea>
+        <div class="suggest-block" id="sug-sketches-wrap">
+          <div class="suggest-label">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8 2L9.5 6h4L10 8.5l1.5 4.5L8 10.5 4.5 13 6 8.5 2.5 6h4L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Suggest an improvement
+          </div>
+          <textarea id="sug-sketches" placeholder="What's missing and what would help? (e.g. 'Member X has only 1 sketch — they need 2 more showing different views or stages of the artwork' or 'The sketches are included but unlabelled — add captions identifying which member drew each one and what aspect of the artwork it shows')"></textarea>
+        </div>
       </div>
       <div class="field">
         <label class="field-label">Visual representation (sketches)</label>
@@ -692,11 +766,18 @@ textarea { min-height: 78px; overflow: hidden; }
           <label class="radio-pill"><input type="radio" name="spec-visual" value="no">Missing</label>
         </div>
         <textarea id="q-spec-visual" placeholder="If included, describe the sketches. Do they clarify the concept?"></textarea>
+        <div class="suggest-block" id="sug-spec-visual-wrap">
+          <div class="suggest-label">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8 2L9.5 6h4L10 8.5l1.5 4.5L8 10.5 4.5 13 6 8.5 2.5 6h4L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Suggest an improvement
+          </div>
+          <textarea id="sug-spec-visual" placeholder="If sketches are missing or unclear, what would improve the visual communication? (e.g. 'Draw a bird's-eye view showing the spatial layout of the installation' or 'Include annotated sketches that label the key technical components and explain what each one does')"></textarea>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- ⑩ Ratings -->
+  <!-- ⑧ Ratings -->
   <div class="card">
     <div class="card-head">
       <h2 class="card-title">Ratings</h2>
@@ -707,7 +788,6 @@ textarea { min-height: 78px; overflow: hidden; }
         <div class="rating-row"><span class="rating-label">Clarity and strength of thesis</span><div class="stars" id="r-thesis" data-val="0"></div></div>
         <div class="rating-row"><span class="rating-label">Clarity of ideas and structure</span><div class="stars" id="r-argument" data-val="0"></div></div>
         <div class="rating-row"><span class="rating-label">Artwork analysis and connections</span><div class="stars" id="r-artworks" data-val="0"></div></div>
-        <div class="rating-row"><span class="rating-label">Technology and digital media integration</span><div class="stars" id="r-tech" data-val="0"></div></div>
         <div class="rating-row"><span class="rating-label">Use of research and evidence</span><div class="stars" id="r-research" data-val="0"></div></div>
         <div class="rating-row"><span class="rating-label">Speculative artwork concept</span><div class="stars" id="r-spec" data-val="0"></div></div>
         <div class="rating-row"><span class="rating-label">Overall project quality</span><div class="stars" id="r-overall" data-val="0"></div></div>
@@ -715,7 +795,7 @@ textarea { min-height: 78px; overflow: hidden; }
     </div>
   </div>
 
-  <!-- ⑪ Overall feedback -->
+  <!-- ⑨ Overall feedback -->
   <div class="card">
     <div class="card-head"><h2 class="card-title">Overall feedback</h2></div>
     <div class="card-body">
@@ -756,10 +836,10 @@ textarea { min-height: 78px; overflow: hidden; }
 </main>
 
 <script>
-var STORE      = 'peer-review-2-v1';
-var RADIO_GROUPS = ['thesis-clarity','artwork-count','dm-concepts','sources-req','citations',
+var STORE = 'peer-review-2-v3';
+var RADIO_GROUPS = ['thesis-clarity','artwork-count','sources-req','citations',
                     'spec-present','spec-visual','sketches'];
-var RATING_IDS   = ['r-thesis','r-argument','r-artworks','r-tech','r-research','r-spec','r-overall'];
+var RATING_IDS   = ['r-thesis','r-argument','r-artworks','r-research','r-spec','r-overall'];
 var SCALE_IDS    = ['sc-argument'];
 
 /* ── Stars ── */
@@ -800,6 +880,9 @@ function buildScales() {
         c.querySelectorAll('.scale-btn').forEach(function(b) {
           b.classList.toggle('active', +b.getAttribute('data-v') === v);
         });
+        // Show suggest block if score is low (1-3)
+        var sugWrap = document.getElementById('sug-argument-wrap');
+        if (sugWrap) sugWrap.classList.toggle('visible', v <= 3);
         save(); updateProgress();
       });
     });
@@ -891,6 +974,11 @@ function load() {
           sc.querySelectorAll('.scale-btn').forEach(function(b) {
             b.classList.toggle('active', +b.getAttribute('data-v') === +v);
           });
+          // Restore suggest visibility
+          if (k === 'scale-sc-argument') {
+            var sugWrap = document.getElementById('sug-argument-wrap');
+            if (sugWrap) sugWrap.classList.toggle('visible', +v <= 3 && +v > 0);
+          }
         }
       } else {
         var field = document.getElementById(k);
@@ -914,11 +1002,16 @@ document.querySelectorAll('input[type="radio"]').forEach(function(el) {
   el.addEventListener('change', function() { save(); updateProgress(); });
 });
 
-/* ── Print helpers: swap textareas for divs so height is natural ── */
+/* ── Print helpers ── */
 function prepareForPrint() {
+  // Make all low-score suggest blocks visible in print
+  document.querySelectorAll('.low-score-suggest').forEach(function(el) {
+    el.classList.add('visible');
+  });
   document.querySelectorAll('textarea').forEach(function(ta) {
     var div = document.createElement('div');
-    div.className = 'print-text-proxy';
+    var isSuggest = ta.closest('.suggest-block') !== null;
+    div.className = isSuggest ? 'suggest-print-proxy' : 'print-text-proxy';
     div.textContent = ta.value || '';
     ta.parentNode.insertBefore(div, ta);
     ta.style.display = 'none';
@@ -933,7 +1026,7 @@ function prepareForPrint() {
 }
 
 function restoreAfterPrint() {
-  document.querySelectorAll('.print-text-proxy').forEach(function(div) {
+  document.querySelectorAll('.print-text-proxy, .suggest-print-proxy').forEach(function(div) {
     div.parentNode.removeChild(div);
   });
   document.querySelectorAll('textarea, input[type="text"]').forEach(function(el) {
@@ -975,6 +1068,9 @@ function clearForm() {
     if (!c) return;
     c.setAttribute('data-val', '0');
     c.querySelectorAll('.scale-btn').forEach(function(b) { b.classList.remove('active'); });
+  });
+  document.querySelectorAll('.low-score-suggest').forEach(function(el) {
+    el.classList.remove('visible');
   });
   document.getElementById('save-label').textContent = '';
   updateProgress();
